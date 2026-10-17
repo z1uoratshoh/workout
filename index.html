@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0809">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Тренировки">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<title>Тренировки — 30 дней</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0d0809; --panel:#1a1112; --panel2:#231718; --line:#3a2527;
+  --text:#f6efef; --muted:#b09a9b; --accent:#e5484d; --accent-ink:#1a0708; --red:#ff9a8a;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; color:var(--text);
+  background:radial-gradient(ellipse at 50% -25%,#3a1517 0%,var(--bg) 55%) no-repeat, var(--bg);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding:env(safe-area-inset-top,0px) 16px env(safe-area-inset-bottom,0px);
+  -webkit-tap-highlight-color:transparent;
+}
+.app{max-width:520px;margin:0 auto;padding:22px 0 36px}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.brand{font-weight:800;letter-spacing:.6px;font-size:18px;text-transform:uppercase}
+.brand span{color:var(--accent)}
+.pill{font-size:12px;color:var(--accent);border:1px solid #6b2a2e;border-radius:99px;padding:6px 10px}
+
+.hero{background:linear-gradient(135deg,#2b1315,#1a1112);border:1px solid #4a2427;border-radius:22px;padding:20px;margin-bottom:14px}
+.eyebrow{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1.2px}
+.hero h1{font-size:28px;margin:5px 0 2px}
+.sub{color:var(--muted);font-size:13px}
+.progressrow{display:flex;justify-content:space-between;margin:18px 0 9px;font-size:13px}
+.track{height:8px;background:#3d2528;border-radius:20px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);border-radius:20px;transition:width .25s}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:13px 10px}
+.stat strong{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat small{color:var(--muted);font-size:11px}
+
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin:20px 2px 10px}
+.sectionhead h2{font-size:16px;margin:0}
+.hint{font-size:11px;color:var(--muted)}
+
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 12px;scrollbar-width:thin}
+.day{
+  flex:0 0 54px;position:relative;border:1px solid var(--line);background:var(--panel);
+  border-radius:14px;padding:9px 4px;color:var(--muted);text-align:center;font:inherit;font-size:11px;cursor:pointer;
+}
+.day b{display:block;color:var(--text);font-size:16px;margin-bottom:3px}
+.day span{display:block;white-space:nowrap}
+.day.today span{color:var(--accent)}
+.day.has::after{content:"";position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.day.done{border-color:#a6343a}
+.day.done b::after{content:" ✓";color:var(--accent);font-size:11px}
+.day.active{background:#3f171a;border-color:var(--accent)}
+.day:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.field{display:block;margin-bottom:14px}
+.trio .field{margin-bottom:0}
+.field > span{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px}
+input[type=number],textarea{
+  width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);
+  border-radius:12px;padding:12px;font:inherit;font-size:16px;
+}
+input[type=number]{font-variant-numeric:tabular-nums}
+textarea{resize:vertical;min-height:84px;line-height:1.4}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+::placeholder{color:#6e5a5c}
+
+.workout{
+  display:flex;align-items:center;gap:12px;margin:16px 0 14px;padding:14px;cursor:pointer;
+  background:var(--panel2);border:1px solid var(--line);border-radius:14px;font-weight:650;
+}
+.workout.on{border-color:var(--accent);background:#2f1214}
+.workout input{width:26px;height:26px;accent-color:var(--accent);margin:0;flex:none;cursor:pointer}
+.workout small{display:block;font-weight:400;color:var(--muted);font-size:12px;margin-top:2px}
+
+.note{color:var(--muted);font-size:11px;line-height:1.5;margin:12px 3px}
+.actions{display:flex;gap:9px;margin-top:16px}
+.btn{flex:1;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:12px;border-radius:13px;font:inherit;font-weight:600;cursor:pointer}
+.btn.danger{color:var(--red)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.fill{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand">Тренировки<span>.</span></div>
+    <div class="pill">30 ДНЕЙ</div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Твой дневник тренировок</div>
+    <h1 id="dayTitle">День 1</h1>
+    <div class="sub" id="dateLabel"></div>
+    <div class="progressrow"><span>Заполнено за день</span><b id="dayCount">0 из 5</b></div>
+    <div class="track"><div class="fill" id="dayFill"></div></div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><strong id="stWorkouts">0/30</strong><small>Тренировок</small></div>
+    <div class="stat"><strong id="stSleep">—</strong><small>Средний сон</small></div>
+    <div class="stat"><strong id="stWeight">—</strong><small>Вес с начала</small></div>
+  </section>
+
+  <div class="sectionhead"><h2>30 дней</h2><span class="hint">Выбери день</span></div>
+  <div class="days" id="days"></div>
+
+  <div class="sectionhead"><h2 id="formHeading">День 1</h2><span class="hint">Сохраняется само</span></div>
+  <section class="card">
+    <div class="trio">
+      <label class="field"><span>Рост, см</span><input id="fH" type="number" inputmode="decimal" step="0.1" min="0"></label>
+      <label class="field"><span>Вес, кг</span><input id="fW" type="number" inputmode="decimal" step="0.1" min="0"></label>
+      <label class="field"><span>Сон, часы</span><input id="fS" type="number" inputmode="decimal" step="0.1" min="0" max="24"></label>
+    </div>
+
+    <label class="workout" id="workoutRow">
+      <input id="fT" type="checkbox">
+      <span>Тренировка выполнена<small>Отметь, когда закончил</small></span>
+    </label>
+
+    <label class="field"><span>Питание: что ел за день</span><textarea id="fF" placeholder="Завтрак, обед, ужин, перекусы, вода"></textarea></label>
+    <label class="field" style="margin-bottom:0"><span>Заметки к тренировке</span><textarea id="fN" placeholder="Упражнения, подходы, веса, самочувствие"></textarea></label>
+  </section>
+
+  <p class="note" id="sync"></p>
+  <p class="note">Всё сохраняется автоматически: на телефоне и в облаке (MockAPI), если ты вставил свой адрес.</p>
+  <div class="actions">
+    <button class="btn" id="clearDay" type="button">Очистить день</button>
+    <button class="btn danger" id="reset" type="button">Начать заново</button>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  // ВСТАВЬ СВОЙ АДРЕС из MockAPI: Base URL + /workout
+  // Пример: https://64abc123.mockapi.io/api/v1/workout
+  var API = 'https://69e0de2529c070e6597c2d94.mockapi.io/workout';
+  var ENABLED = API.indexOf('PASTE_YOUR_ID') === -1;
+  var HDR = { 'Content-Type': 'application/json' };
+
+  var KEY = 'train-log-v1', META = 'train-log-meta-v1', DAYS = 30;
+  var $ = function (id) { return document.getElementById(id); };
+  var F = { h: $('fH'), w: $('fW'), s: $('fS'), f: $('fF'), n: $('fN'), t: $('fT') };
+  var daysEl = $('days');
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function todayISO() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function dayNum(iso) { var p = iso.split('-').map(Number); return Date.UTC(p[0], p[1] - 1, p[2]) / 864e5; }
+  var fmt = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+
+  var data = {}, meta = {};
+  try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+  try { meta = JSON.parse(localStorage.getItem(META)) || {}; } catch (e) {}
+  meta.updatedAt = meta.updatedAt || 0;
+  meta.start = meta.start || todayISO();
+
+  function saveLocal() {
+    try { localStorage.setItem(KEY, JSON.stringify(data)); localStorage.setItem(META, JSON.stringify(meta)); } catch (e) {}
+  }
+  saveLocal();
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
+
+  function dateLabel(d) {
+    var p = meta.start.split('-').map(Number);
+    return fmt.format(new Date(Date.UTC(p[0], p[1] - 1, p[2] + d - 1))).replace('.', '');
+  }
+  function todayIdx() {
+    return Math.min(DAYS, Math.max(1, dayNum(todayISO()) - dayNum(meta.start) + 1));
+  }
+  var selected = todayIdx();
+
+  /* ---------- дни ---------- */
+  function buildChips() {
+    daysEl.innerHTML = '';
+    for (var d = 1; d <= DAYS; d++) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'day';
+      b.dataset.d = d;
+      b.setAttribute('aria-label', 'День ' + d);
+      b.innerHTML = '<b>' + d + '</b><span>' + dateLabel(d) + '</span>';
+      daysEl.appendChild(b);
+    }
+    updateChips();
+  }
+  function updateChips() {
+    var t = todayIdx();
+    Array.prototype.forEach.call(daysEl.children, function (b) {
+      var d = +b.dataset.d, e = data[d];
+      b.classList.toggle('active', d === selected);
+      b.classList.toggle('done', !!(e && e.t));
+      b.classList.toggle('has', !!e && !e.t);
+      b.classList.toggle('today', d === t);
+    });
+  }
+  daysEl.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.day');
+    if (!b) return;
+    selected = +b.dataset.d;
+    updateChips();
+    fillForm();
+    b.scrollIntoView({ inline: 'center', block: 'nearest' });
+  });
+
+  /* ---------- форма ---------- */
+  function lastBefore(d, k) {
+    for (var i = d - 1; i >= 1; i--) if (data[i] && data[i][k]) return data[i][k];
+    return '';
+  }
+  function fillForm() {
+    var e = data[selected] || {};
+    F.h.value = e.h || ''; F.w.value = e.w || ''; F.s.value = e.s || '';
+    F.f.value = e.f || ''; F.n.value = e.n || ''; F.t.checked = !!e.t;
+    ['h', 'w'].forEach(function (k) { F[k].placeholder = lastBefore(selected, k) || '—'; });
+    F.s.placeholder = '—';
+    $('dayTitle').textContent = 'День ' + selected;
+    $('formHeading').textContent = 'День ' + selected;
+    $('dateLabel').textContent = dateLabel(selected) + (selected === todayIdx() ? ', сегодня' : '');
+    renderDay();
+  }
+  function renderDay() {
+    var e = data[selected] || {};
+    var n = ['h', 'w', 's', 'f', 't'].filter(function (k) { return !!e[k]; }).length;
+    $('dayCount').textContent = n + ' из 5';
+    $('dayFill').style.width = (n / 5 * 100) + '%';
+    $('workoutRow').classList.toggle('on', F.t.checked);
+  }
+  function renderStats() {
+    var workouts = 0, sleepSum = 0, sleepN = 0, weights = [];
+    for (var d = 1; d <= DAYS; d++) {
+      var e = data[d];
+      if (!e) continue;
+      if (e.t) workouts++;
+      var s = parseFloat(e.s);
+      if (!isNaN(s)) { sleepSum += s; sleepN++; }
+      var w = parseFloat(e.w);
+      if (!isNaN(w)) weights.push(w);
+    }
+    $('stWorkouts').textContent = workouts + '/' + DAYS;
+    $('stSleep').textContent = sleepN ? (Math.round(sleepSum / sleepN * 10) / 10) + ' ч' : '—';
+    if (weights.length >= 2) {
+      var diff = Math.round((weights[weights.length - 1] - weights[0]) * 10) / 10;
+      $('stWeight').textContent = (diff > 0 ? '+' : diff < 0 ? '−' : '') + Math.abs(diff) + ' кг';
+    } else {
+      $('stWeight').textContent = '—';
+    }
+  }
+
+  var timer;
+  function touch() {
+    meta.updatedAt = Date.now();
+    saveLocal();
+    clearTimeout(timer);
+    timer = setTimeout(push, 800);
+  }
+  function onEdit() {
+    var e = {};
+    ['h', 'w', 's', 'f', 'n'].forEach(function (k) { var v = F[k].value.trim(); if (v) e[k] = v; });
+    if (F.t.checked) e.t = 1;
+    if (Object.keys(e).length) data[selected] = e; else delete data[selected];
+    touch(); updateChips(); renderStats(); renderDay();
+  }
+  ['h', 'w', 's', 'f', 'n'].forEach(function (k) { F[k].addEventListener('input', onEdit); });
+  F.t.addEventListener('change', onEdit);
+
+  $('clearDay').addEventListener('click', function () {
+    if (!confirm('Очистить все данные за день ' + selected + '?')) return;
+    delete data[selected];
+    touch(); updateChips(); fillForm(); renderStats();
+  });
+  $('reset').addEventListener('click', function () {
+    if (!confirm('Удалить все данные и начать новый цикл с сегодняшнего дня? Это нельзя отменить.')) return;
+    data = {};
+    meta.start = todayISO();
+    selected = 1;
+    touch(); buildChips(); fillForm(); renderStats();
+    clearTimeout(timer); push();
+  });
+
+  /* ---------- синхронизация с MockAPI ---------- */
+  function setStatus(t) { $('sync').textContent = t; }
+
+  async function push() {
+    if (!ENABLED) return;
+    setStatus('Сохраняю в облако…');
+    var body = JSON.stringify({ data: JSON.stringify({ days: data, start: meta.start, updatedAt: meta.updatedAt }) });
+    try {
+      if (meta.id) {
+        var r1 = await fetch(API + '/' + meta.id, { method: 'PUT', headers: HDR, body: body });
+        if (r1.status === 404) meta.id = null; else if (!r1.ok) throw 0;
+      }
+      if (!meta.id) {
+        var r2 = await fetch(API, { method: 'POST', headers: HDR, body: body });
+        if (!r2.ok) throw 0;
+        meta.id = (await r2.json()).id;
+      }
+      saveLocal();
+      setStatus('☁ Синхронизировано');
+    } catch (e) {
+      setStatus('Нет связи: всё сохранено на телефоне, отправлю позже');
+    }
+  }
+
+  async function pull() {
+    if (!ENABLED) return;
+    setStatus('Загружаю из облака…');
+    try {
+      var rec = null;
+      if (meta.id) {
+        var r = await fetch(API + '/' + meta.id);
+        if (r.ok) rec = await r.json();
+      }
+      if (!rec) {
+        var rl = await fetch(API);
+        if (rl.ok) {
+          var list = await rl.json();
+          if (Array.isArray(list) && list.length) rec = list[0];
+        } else if (rl.status !== 404) throw 0;
+      }
+      if (rec) {
+        meta.id = rec.id;
+        var remote = {};
+        try { remote = JSON.parse(rec.data) || {}; } catch (e) {}
+        if ((remote.updatedAt || 0) > meta.updatedAt) {
+          data = remote.days || {};
+          meta.start = remote.start || meta.start;
+          meta.updatedAt = remote.updatedAt;
+          saveLocal();
+          buildChips(); fillForm(); renderStats();
+          setStatus('☁ Синхронизировано');
+          return;
+        }
+      }
+      await push();
+    } catch (e) {
+      setStatus('Нет связи: работаю с данными на телефоне');
+    }
+  }
+
+  /* ---------- старт ---------- */
+  buildChips();
+  fillForm();
+  renderStats();
+  if (!ENABLED) setStatus('Облако не подключено: данные только на этом устройстве');
+  var act = daysEl.querySelector('.day.active');
+  if (act) act.scrollIntoView({ inline: 'center', block: 'nearest' });
+  pull();
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') pull();
+  });
+  window.addEventListener('online', push);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
